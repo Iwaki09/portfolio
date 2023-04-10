@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>Kanagawa</title>
+        <script src="./d3.js" charset="utf-8"></script>
+        <script src="./topojson.js" charset="utf-8"></script>
+    </head>
+<button id="home">Home画面に戻る</button>
+<body>
+
+<!--  ---------------- 岩城追加部分 ----------------  -->
+<body bgcolor = "#505050">
+<!--  ---------------- 岩城追加部分 ----------------  -->
+
+<p><labal for = "city">調べたい都市を選択してください</labal>
+<select id="city">
+<option value = "">選択してください</option>
+<option value = "aikawa">愛川町</option>
+<option value = "atsugi">厚木市</option>
+<option value = "ayase">綾瀬市</option>
+<option value = "isehara">伊勢原市</option>
+<option value = "ebina">海老名市</option>
+<option value = "oi">大井町</option>
+<option value = "oiso">大磯町</option>
+<option value = "odawara">小田原市</option>
+<option value = "kaisei">開成町</option>
+<option value = "kamakura">鎌倉市</option>
+<option value = "kawasaki">川崎市</option>
+<option value = "kiyokawa">清川村</option>
+<option value = "sagamihara">相模原市</option>
+<option value = "zama">座間市</option>
+<option value = "samukawa">寒川町</option>
+<option value = "zushi">逗子市</option>
+<option value = "chigasaki">茅ヶ崎市</option>
+<option value = "nakai">中井町</option>
+<option value = "ninomiya">二宮町</option>
+<option value = "hakone">箱根町</option>
+<option value = "hadano">秦野市</option>
+<option value = "hayama">葉山町</option>
+<option value = "hiratsuka">平塚市</option>
+<option value = "fujisawa">藤沢市</option>
+<option value = "matsuda">松田町</option>
+<option value = "manazuru">真鶴町</option>
+<option value = "miura">三浦市</option>
+<option value = "minamiasigara">南足柄市</option>
+<option value = "yamakita">山北町</option>
+<option value = "yamato">大和市</option>
+<option value = "yugawara">湯河原町</option>
+<option value = "yokosuka">横須賀市</option>
+<option value = "yokohama">横浜市</option>
+</select></p>
+
+<div>
+<input type = "button" value = "Check" id = "checkButton">
+</div>
+
+<svg id="map" style="background-color: #505050;"></svg>
+
+<!--  ---------------- 岩城追加部分 ----------------  -->
+<svg id="bubble" style="background-color: #505050;"></svg>
+<!--  ---------------- 岩城追加部分 ----------------  -->
+
+<script>
+var width = 800;
+var height = 800;
+
+var projection = d3.geoMercator()
+                    .center([139.3, 35.4])
+                    .translate([width/2, height/2])
+                    .scale(37500);
+
+var coordinate = projection([0, 0]);
+
+function buttonClick(){
+    console.log(citySelect.value);
+    console.log('cityname:'+cityname+'に移動します');
+    if (cityname === "aikawa"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=aikawa";
+    }
+    else if (cityname === "atsugi"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=atsugi";
+    }
+    else if (cityname === "ayase"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=ayase";
+    }
+    else if (cityname === "isehara"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=isehara";
+    }
+    else if (cityname === "ebina"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=ebina";
+    }
+    else if (cityname === "oi"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=oi";
+    }
+    else if (cityname === "oiso"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=oiso";
+    }
+    else if (cityname === "odawara"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=odawara";
+    }
+    else if (cityname === "kaisei"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=kaisei";
+    }
+    else if (cityname === "kamakura"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=kamakura";
+    }
+    else if (cityname === "kiyokawa"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=kiyokawa";
+    }
+    else if (cityname === "zama"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=zama";
+    }
+    else if (cityname === "samukawa"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=samukawa";
+    }
+    else if (cityname === "zushi"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=zushi";
+    }
+    else if (cityname === "chigasaki"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=chigasaki";
+    }
+    else if (cityname === "nakai"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=nakai";
+    }
+    else if (cityname === "ninomiya"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=ninomiya";
+    }
+    else if (cityname === "hakone"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=hakone";
+    }
+    else if (cityname === "hadano"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=hadano";
+    }
+    else if (cityname === "hayama"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=hayama";
+    }
+    else if (cityname === "hiratsuka"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=hiratsuka";
+    }
+    else if (cityname === "fujisawa"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=fujisawa";
+    }
+    else if (cityname === "matsuda"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=matsuda";
+    }
+    else if (cityname === "manazuru"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=manazuru";
+    }
+    else if (cityname === "miura"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=miura";
+    }
+    else if (cityname === "minamiasigara"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=minamiasigara";
+    }
+    else if (cityname === "yamakita"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=yamakita";
+    }
+    else if (cityname === "yamato"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=yamato";
+    }
+    else if (cityname === "yugawara"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=yugawara";
+    }
+    else if (cityname === "yokosuka"){
+        window.location.href = "../../bubble.html?prefecture=kanagawa&cityname=yokosuka";
+    }
+}
+
+function valueChange(){
+    cityname = citySelect.value;
+    console.log('cityname:'+cityname);
+    if (cityname === ""){
+        d3.select("circle").remove();
+    }
+    else if (cityname === "aikawa"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3216, 35.5288]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "atsugi"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3424, 35.443]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "ayase"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.4276, 35.4366]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "isehara"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3149, 35.4029]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "ebina"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3908, 35.4464]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "oi"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.1665, 35.3366]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 6)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "oiso"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3013, 35.3126]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 5)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "odawara"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.1521, 35.2645]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "kaisei"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.1235, 35.3363]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 6)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "kamakura"){
+
+        d3.select("circle").remove();
+
+        coordinate = projection([139.546673, 35.319213]);
+
+        svg.append("g")
+            .append("circle")
+            .attr("cx", coordinate[0])
+            .attr("cy", coordinate[1])
+            .attr("r", 8)
+            .attr("stroke", "black")
+            .attr("fill", "red");
+    }
+    else if (cityname === "kawasaki"){
+        d3.select("circle").remove();
+    }
+    else if (cityname === "kiyokawa"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.2266, 35.4826]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "sagamihara"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3731, 35.5714]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "zama"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.4075, 35.4886]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "samukawa"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3906, 35.374]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 7)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "zushi"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.5904, 35.2996]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "chigasaki"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.4036, 35.3338]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "nakai"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.2184, 35.3307]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "ninomiya"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.2551, 35.2994]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 6)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "hakone"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.05, 35.2323]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "hadano"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.2099, 35.3947]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "hayama"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.5861, 35.272]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "hiratsuka"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.3394, 35.3481]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "fujisawa"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.47, 35.3591]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "matsuda"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.1291, 35.3981]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "manazuru"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.1371, 35.1584]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 5)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "miura"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.6407, 35.1641]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "minamiasigara"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.0601, 35.3103]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "yamakita"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.0638, 35.4206]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "yamato"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.4579, 35.4875]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "yugawara"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.0938, 35.1679]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "yokosuka"){
+        d3.select("circle").remove();
+
+        coordinate = projection([139.6522, 35.2413]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+    else if (cityname === "yokohama"){
+        d3.select("circle").remove();
+    }
+}
+
+let citySelect = document.getElementById('city');
+citySelect.options[0].selected = true;
+citySelect.addEventListener('change', valueChange);
+
+let cityname = citySelect.value;
+console.log('cityname:' + cityname);
+
+let checkButton = document.getElementById('checkButton');
+checkButton.addEventListener('click', buttonClick);
+
+document.getElementById("home").onclick = function(){
+  window.location.href = "../../map.html";
+}
+</script>
+
+<script type = "text/javascript">
+
+var svg = d3.select("#map")
+    .attr("width", width)
+    .attr("height", height);
+
+
+
+/* ---------------- 岩城追加部分 はじまり---------------- */
+var svg_bubble = d3.select("#bubble")
+    .attr("width", "400")
+    .attr("height", height);
+/* ---------------- 岩城追加部分 おわり---------------- */
+
+
+
+d3.json("./14.topojson").then(function(data){
+
+    var Kanagawa = topojson.feature(data, data.objects.Kanagawa);
+
+    var projection = d3.geoMercator()
+                    .center([139.3, 35.4])
+                    .translate([width/2, height/2])
+                    .scale(37500);
+
+    var path = d3.geoPath().projection(projection);
+
+
+    svg.selectAll("path")
+        .data(Kanagawa.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", "white")
+        .attr("stroke", "#333333")
+        .attr("stroke-width", 0.3);
+
+
+
+
+
+/* ---------------- 岩城追加部分 はじまり---------------- */
+    
+
+
+
+
+    d3.csv("./"+"kanagawa"+'_for_bubble.csv').then(display);
+
+    function bubbleChart() {
+        const width = 400;
+        const height = 800;
+
+        const centre = { x: width/2 ,y: height/2 };
+
+        const forceStrength = 0.05;
+
+        let svg = null;
+        let bubbles = null;
+        let labels = null;
+        let nodes = [];
+
+        function charge(d) {
+            return Math.pow(d.radius, 2.0) * 0.01
+        }
+
+        const simulation = d3.forceSimulation()
+            .force('charge', d3.forceManyBody().strength(charge))
+            .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+            .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+            .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+        simulation.stop();
+
+        const fillColour = d3.scaleOrdinal()
+            .domain(["1", "2", "3", "5", "99"])
+            .range(["#0074D9", "#7FDBFF", "#39CCCC", "#3D9970", "#AAAAAA"]);
+
+        function createNodes(rawData) {
+            const maxSize = d3.max(rawData, d => +d.num);
+
+            const radiusScale = d3.scaleSqrt()
+            .domain([0, maxSize])
+            .range([0, 25])
+
+            const myNodes = rawData.map(d => ({
+            ...d,
+            radius: radiusScale(+d.num),
+            size: +d.num,
+            x: Math.random() * 900,
+            y: Math.random() * 800
+            }))
+
+            return myNodes;
+        }
+
+        let chart = function chart(selector, rawData) {
+            nodes = createNodes(rawData);
+
+            
+
+            svg_bubble = d3.select(selector)
+            .append('svg')
+            .attr("class", "svg_bubble")
+            .attr('width', width)
+            .attr('height', height)
+
+            var rect = svg_bubble.append("rect")
+                  .attr("width", 370)
+                  .attr("height", 50)
+                  .attr("x", 10)
+                  .attr("y", 165)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+            
+            svg_bubble.append("text")
+                .attr("text-anchor", "end")
+                .attr("x", width - 30)
+                .attr("y", height - 600)
+                .style("font-size", "20px")
+                .style("color", "red")
+                .text("神奈川県の地名でよく使われている漢字");
+            
+                
+
+            const elements = svg_bubble.selectAll('.bubble')
+            .data(nodes, d => d.let)
+            .enter()
+            .append('g')
+
+            bubbles = elements
+            .append('circle')
+            .classed('bubble', true)
+            .attr('r', d => d.radius)
+            .attr('fill', d => fillColour("3"))
+
+            labels = elements
+            .append('text')
+            .attr('dy', '.3em')
+            .style('text-anchor', 'middle')
+            .style('font-size', 10)
+            .text(d => d.let)
+
+            simulation.nodes(nodes)
+            .on('tick', ticked)
+            .restart();
+        }
+
+        function ticked() {
+            bubbles
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+
+            labels
+            .attr('x', d => d.x)
+            .attr('y', d => d.y)
+        }
+
+        return chart;
+        }
+
+    let myBubbleChart = bubbleChart();
+
+    function display(data) {
+        myBubbleChart("#bubble", data);
+    }
+
+    /* ---------------- 岩城追加部分 おわり---------------- */
+
+    })
+</script>
+</body>

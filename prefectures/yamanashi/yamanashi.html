@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>Yamanashi</title>
+        <script src="./d3.js" charset="utf-8"></script>
+        <script src="./topojson.js" charset="utf-8"></script>
+    </head>
+    <button id="home">Home画面に戻る</button>
+<body>
+<body bgcolor = "#505050"></body>
+
+<p><labal for = "city">調べたい都市を選択してください</labal>
+<select id="city">
+<option value = "">選択してください</option>
+</select></p>
+
+<div>
+  <input type="button" value="Check" id="checkButton">
+  </div>
+  
+  <svg id="map" style="background-color: #505050;"></svg>
+  
+  <svg id="bubble" style="backgroud-color: #505050;"></svg>
+  
+<script>
+document.getElementById("home").onclick = function(){
+  window.location.href = "../../map.html";
+}
+</script>
+<script type = "text/javascript">
+var width = 800;
+var height = 800;
+
+var svg = d3.select("#map")
+            .attr("width", width)
+            .attr("height", height);
+
+var svg_bubble = d3.select("#bubble")
+    .attr("width", "400")
+    .attr("height", height);
+
+d3.json("./19.topojson").then(function(data){
+
+    var Yamanashi = topojson.feature(data, data.objects.Yamanashi);
+
+    var projection = d3.geoMercator()
+                    .center([138.6, 35.6])
+                    .translate([width/2, height/2])
+                    .scale(30000);
+
+    var path = d3.geoPath().projection(projection);
+
+
+    svg.selectAll("path")
+        .data(Yamanashi.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", "white")
+        .attr("stroke", "#333333")
+        .attr("stroke-width", 0.3);
+
+        d3.csv("./"+"yamanashi"+'_for_bubble.csv').then(display);
+
+function bubbleChart() {
+    const width = 400;
+    const height = 800;
+
+    const centre = { x: width/2 ,y: height/2 };
+
+    const forceStrength = 0.05;
+
+    let svg = null;
+    let bubbles = null;
+    let labels = null;
+    let nodes = [];
+
+    function charge(d) {
+        return Math.pow(d.radius, 2.0) * 0.01
+    }
+
+    const simulation = d3.forceSimulation()
+        .force('charge', d3.forceManyBody().strength(charge))
+        .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+        .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+        .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+    simulation.stop();
+
+    const fillColour = d3.scaleOrdinal()
+        .domain(["1", "2", "3", "5", "99"])
+        .range(["#0074D9", "#7FDBFF", "#39CCCC", "#3D9970", "#AAAAAA"]);
+
+    function createNodes(rawData) {
+        const maxSize = d3.max(rawData, d => +d.num);
+
+        const radiusScale = d3.scaleSqrt()
+        .domain([0, maxSize])
+        .range([0, 25])
+
+        const myNodes = rawData.map(d => ({
+        ...d,
+        radius: radiusScale(+d.num),
+        size: +d.num,
+        x: Math.random() * 900,
+        y: Math.random() * 800
+        }))
+
+        return myNodes;
+    }
+
+    let chart = function chart(selector, rawData) {
+        nodes = createNodes(rawData);
+
+        
+
+        svg_bubble = d3.select(selector)
+        .append('svg')
+        .attr("class", "svg_bubble")
+        .attr('width', width)
+        .attr('height', height)
+
+        var rect = svg_bubble.append("rect")
+              .attr("width", 370)
+              .attr("height", 50)
+              .attr("x", 10)
+              .attr("y", 165)
+              .attr("fill", "rgb(188,226,232)")
+              .attr("stroke", "black")
+              .attr("stroke-width", 3);
+        
+        svg_bubble.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width - 30)
+            .attr("y", height - 600)
+            .style("font-size", "20px")
+            .style("color", "red")
+            .text("山梨県の地名でよく使われている漢字");
+        
+            
+
+        const elements = svg_bubble.selectAll('.bubble')
+        .data(nodes, d => d.let)
+        .enter()
+        .append('g')
+
+        bubbles = elements
+        .append('circle')
+        .classed('bubble', true)
+        .attr('r', d => d.radius)
+        .attr('fill', d => fillColour("3"))
+
+        labels = elements
+        .append('text')
+        .attr('dy', '.3em')
+        .style('text-anchor', 'middle')
+        .style('font-size', 10)
+        .text(d => d.let)
+
+        simulation.nodes(nodes)
+        .on('tick', ticked)
+        .restart();
+    }
+
+    function ticked() {
+        bubbles
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+
+        labels
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+    }
+
+    return chart;
+    }
+
+let myBubbleChart = bubbleChart();
+
+function display(data) {
+    myBubbleChart("#bubble", data);
+}
+})
+</script>
+</body>

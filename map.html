@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Japan</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+</head>
+<body>
+<svg id="map" style="background-color: #505050;"></svg>
+<body bgcolor = "#505050"></body>
+
+<script>
+    (function() {
+
+        // SVGの大きさ
+        var width = 800;
+        var height = 600;
+
+        // 中心座標とスケール
+        var projection = d3.geoMercator()
+            .center([137, 38])
+            .scale(1600)
+            .translate([width / 2, height / 2]);
+
+        var path = d3.geoPath().projection(projection);
+
+        var svg = d3.select("#map")
+            .attr("width", width)
+            .attr("height", height);
+
+        d3.json("./japan.json").then(function(data) {
+            svg.selectAll("path")  
+                .data(topojson.feature(data, data.objects.pref).features)
+                .enter() // dataで入れた配列をそれぞれ以下のpathにしていく
+                .append("path")
+                .attr("d", path) // <path d="">に　path()の返り値を入れていく
+                .attr("fill", "white")
+                .attr("stroke", "#333333")
+                .attr("stroke-width", 0.3)
+                .on("click", function(d,i){//都道府県をクリックしたらその県の白地図を表示させる
+                    if(d.properties.code === 1){
+                        window.location.href = './prefectures/hokkaido/hokkaido.html';
+                    }
+                    else if(d.properties.code === 2){
+                        window.location.href = './prefectures/aomori/aomori.html';
+                    }
+                    else if(d.properties.code === 3){
+                        window.location.href = './prefectures/iwate/iwate.html';
+                    }
+                    else if(d.properties.code === 4){
+                        window.location.href = './prefectures/miyagi/miyagi.html';
+                    }
+                    else if(d.properties.code === 5){
+                        window.location.href = './prefectures/akita/akita.html';
+                    }
+                    else if(d.properties.code === 6){
+                        window.location.href = './prefectures/yamagata/yamagata.html';
+                    }
+                    else if(d.properties.code === 7){
+                        window.location.href = './prefectures/fukushima/fukushima.html';
+                    }
+                    else if (d.properties.code === 8){
+                        window.location.href = './prefectures/ibaraki/ibaraki.html';
+                    }
+                    else if(d.properties.code === 9){
+                        window.location.href = './prefectures/tochigi/tochigi.html';
+                    }
+                    else if(d.properties.code === 10){
+                        window.location.href = './prefectures/gunma/gunma.html';
+                    }
+                    else if(d.properties.code === 11){
+                        window.location.href = './prefectures/saitama/saitama.html';
+                    }
+                    else if(d.properties.code === 12){
+                        window.location.href = './prefectures/chiba/chiba.html';
+                    }
+                    else if(d.properties.code === 13){
+                        window.location.href = './prefectures/tokyo/tokyo.html';
+                    }
+                    else if(d.properties.code === 14) {
+                        window.location.href = './prefectures/kanagawa/kanagawa.html';
+                    }
+                    else if(d.properties.code === 15){
+                        window.location.href = './prefectures/niigata/niigata.html';
+                    }
+                    else if(d.properties.code === 16){
+                        window.location.href = './prefectures/toyama/toyama.html';
+                    }
+                    else if(d.properties.code === 17){
+                        window.location.href = './prefectures/ishikawa/ishikawa.html';
+                    }
+                    else if(d.properties.code === 18){
+                        window.location.href = './prefectures/fukui/fukui.html';
+                    }
+                    else if(d.properties.code === 19){
+                        window.location.href = './prefectures/yamanashi/yamanashi.html';
+                    }
+                    else if(d.properties.code === 20){
+                        window.location.href = './prefectures/nagano/nagano.html';
+                    }
+                    else if(d.properties.code === 21){
+                        window.location.href = './prefectures/gifu/gifu.html';
+                    }
+                    else if(d.properties.code === 22){
+                        window.location.href = './prefectures/shizuoka/shizuoka.html';
+                    }
+                    else if(d.properties.code === 23){
+                        window.location.href = './prefectures/aichi/aichi.html';
+                    }
+                    else if(d.properties.code === 24){
+                        window.location.href = './prefectures/mie/mie.html';
+                    }
+                    else if(d.properties.code === 25){
+                        window.location.href = './prefectures/shiga/shiga.html';
+                    }
+                    else if(d.properties.code === 26){
+                        window.location.href = './prefectures/kyoto/kyoto.html';
+                    }
+                    else if(d.properties.code === 27){
+                        window.location.href = './prefectures/osaka/osaka.html';
+                    }
+                    else if(d.properties.code === 28){
+                        window.location.href = './prefectures/hyogo/hyogo.html';
+                    }
+                    else if(d.properties.code === 29){
+                        window.location.href = './prefectures/nara/nara.html';
+                    }
+                    else if(d.properties.code === 30){
+                        window.location.href = './prefectures/wakayama/wakayama.html';
+                    }
+                    else if(d.properties.code === 31){
+                        window.location.href = './prefectures/tottori/tottori.html';
+                    }
+                    else if(d.properties.code === 32){
+                        window.location.href = './prefectures/shimane/shimane.html';
+                    }
+                    else if(d.properties.code === 33){
+                        window.location.href = './prefectures/okayama/okayama.html';
+                    }
+                    else if(d.properties.code === 34){
+                        window.location.href = './prefectures/hiroshima/hiroshima.html';
+                    }
+                    else if(d.properties.code === 35){
+                        window.location.href = './prefectures/yamaguchi/yamaguchi.html';
+                    }
+                    else if(d.properties.code === 36){
+                        window.location.href = './prefectures/tokushima/tokushima.html';
+                    }
+                    else if(d.properties.code === 37){
+                        window.location.href = './prefectures/kagawa/kagawa.html';
+                    }
+                    else if(d.properties.code === 38){
+                        window.location.href = './prefectures/ehime/ehime.html';
+                    }
+                    else if(d.properties.code === 39){
+                        window.location.href = './prefectures/kochi/kochi.html';
+                    }
+                    else if(d.properties.code === 40){
+                        window.location.href = './prefectures/fukuoka/fukuoka.html';
+                    }
+                    else if(d.properties.code === 41){
+                        window.location.href = './prefectures/saga/saga.html';
+                    }
+                    else if(d.properties.code === 42){
+                        window.location.href = './prefectures/nagasaki/nagasaki.html';
+                    }
+                    else if(d.properties.code === 43){
+                        window.location.href = './prefectures/kumamoto/kumamoto.html';
+                    }
+                    else if(d.properties.code === 44){
+                        window.location.href = './prefectures/oita/oita.html';
+                    }
+                    else if(d.properties.code === 45){
+                        window.location.href = './prefectures/miyazaki/miyazaki.html';
+                    }
+                    else if(d.properties.code === 46){
+                        window.location.href = './prefectures/kagoshima/kagoshima.html';
+                    }
+                    else if(d.properties.code === 47){
+                        window.location.href = './prefectures/okinawa/okinawa.html';
+                    }
+                });
+        });
+
+    })();
+
+</script>
+</body>
+</html>

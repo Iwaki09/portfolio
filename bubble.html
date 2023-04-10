@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="./d3.js"></script>
+  <style>
+    body { 
+      font-family: "avenir next", Arial, sans-serif;
+      font-size: 12px;
+      margin: 0;
+    }
+  </style>
+</head>
+<button id="home">Home画面に戻る</button>
+
+<body bgcolor = "#808080"></body>
+<div id = 'vis' ></div>
+<script>
+
+var prefecture;
+var cityname;
+
+var ranking_1st_down;
+var ranking_2nd_down;
+var ranking_3rd_down;
+
+var rank1_p;
+var rank1_c;
+var rank2_p;
+var rank2_c;
+var rank3_p;
+var rank3_c;
+
+var rank1_ja_p;
+var rank1_ja_c;
+var rank2_ja_p;
+var rank2_ja_c;
+var rank3_ja_p;
+var rank3_ja_c;
+
+
+window.onload = function() {
+            // URLを取得
+            const url = new URL(window.location.href);
+
+            // URLSearchParamsオブジェクトを取得
+            const params = url.searchParams;
+
+            // consoleに受け取ったパラメータを出力
+            console.log(params);
+
+            // パラメータから「username」を取得
+            prefecture = params.get("prefecture");
+            cityname = params.get("cityname");
+
+            // load data
+            if (cityname == null) d3.csv('./prefectures/kanagawa/kamakura_res.csv').then(display);
+            else d3.csv("./prefectures/"+prefecture+"/"+cityname+'_res.csv').then(display);
+
+            d3.csv("ranking.csv").then(rank);
+
+        }
+
+document.getElementById("home").onclick = function(){
+  window.location.href = "map.html";
+}
+
+// bubbleChart creation function; instantiate new bubble chart given a DOM element to display it in and a dataset to visualise
+function bubbleChart() {
+  const width = 600;
+  const height = 800;
+
+
+  // location to centre the bubbles
+  const centre = { x: width/2-100, y: height/2 };
+
+  // strength to apply to the position forces
+  const forceStrength = 0.03;
+
+  // these will be set in createNodes and chart functions
+  let svg = null;
+  let bubbles = null;
+  let labels = null;
+  let nodes = [];
+
+  // charge is dependent on size of the bubble, so bigger towards the middle
+  function charge(d) {
+    return Math.pow(d.radius, 2.0) * 0.01
+  }
+
+  // create a force simulation and add forces to it
+  const simulation = d3.forceSimulation()
+    .force('charge', d3.forceManyBody().strength(charge))
+    // .force('center', d3.forceCenter(centre.x, centre.y))
+    .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+    .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+    .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+  // force simulation starts up automatically, which we don't want as there aren't any nodes yet
+  simulation.stop();
+
+  // set up colour scale
+  const fillColour = d3.scaleOrdinal()
+  	.domain(["1", "2", "3", "5", "99"])
+  	.range(["#0074D9", "#7FDBFF", "#39CCCC", "#3D9970", "#AAAAAA"]);
+
+  // data manipulation function takes raw data from csv and converts it into an array of node objects
+  // each node will store data and visualisation values to draw a bubble
+  // rawData is expected to be an array of data objects, read in d3.csv
+  // function returns the new node array, with a node for each element in the rawData input
+  function createNodes(rawData) {
+    // use max size in the data as the max in the scale's domain
+    // note we have to ensure that size is a number
+    const maxSize = d3.max(rawData, d => +d.num);
+
+    // size bubbles based on area
+    // サイズの正規化
+    const radiusScale = d3.scaleSqrt()
+      .domain([0, maxSize])
+      .range([0, 40])
+
+    // use map() to convert raw data into node data
+    const myNodes = rawData.map(d => ({
+      ...d,
+      radius: radiusScale(+d.num),
+      size: +d.num,
+      x: Math.random() * 900,
+      y: Math.random() * 800
+    }))
+
+    return myNodes;
+  }
+
+  // main entry point to bubble chart, returned by parent closure
+  // prepares rawData for visualisation and adds an svg element to the provided selector and starts the visualisation process
+  let chart = function chart(selector, rawData) {
+    // convert raw data into nodes data
+    nodes = createNodes(rawData);
+
+    // create svg element inside provided selector
+    svg = d3.select(selector)
+      .append('svg')
+      .attr("class", "svgc")
+      .attr('width', width)
+      .attr('height', height)
+
+    // svgr = d3.select(selector)
+    //     .append("svg")
+    //     .attr("class", "svgr")
+    //     .attr("width", 180)
+    //     .attr("height", height)
+        
+
+    // var ranking_title = svgr.append("text")
+    //     .attr("y", 100)
+    //     .text("似ている市区町村")
+    //     .style("font-size", "25px");
+
+    // var ranking_1st_up = svgr.append("text")
+    //     .attr("y", 130)
+    //     .text("第１位")
+    //     .style("font-size", "20px");
+
+    // ranking_1st_down = svgr.append("text")
+    //     .attr("y", 150)
+    //     // .text("山梨県甲府市")
+    //     .style("font-size", "20px")
+    //     .on("click", function(event, d) {
+    //       window.location.href = "./bubble.html?prefecture="+rank1_p+"&cityname="+rank1_c;
+    //     });
+
+    // var ranking_2nd_up = svgr.append("text")
+    //     .attr("y", 180)
+    //     .text("第２位")
+    //     .style("font-size", "20px");
+
+    // ranking_2nd_down = svgr.append("text")
+    //     .attr("y", 200)
+    //     // .text("〇〇県〇〇市")
+    //     .style("font-size", "20px")
+    //     .on("click", function(event, d) {
+    //       window.location.href = "./bubble.html?prefecture="+rank2_p+"&cityname="+rank2_c;
+    //     });
+
+    // var ranking_3rd_up = svgr.append("text")
+    //     .attr("y", 230)
+    //     .text("第３位")
+    //     .style("font-size", "20px");
+
+    // ranking_3rd_down = svgr.append("text")
+    //     .attr("y", 250)
+    //     // .text("〇〇県〇〇市")
+    //     .style("font-size", "20px")
+    //     .on("click", function(event, d) {
+    //       window.location.href = "./bubble.html?prefecture="+rank3_p+"&cityname="+rank3_c;
+    //     });
+
+
+    var rect = svg.append("rect")
+                  .attr("width", 210)
+                  .attr("height", 100)
+                  .attr("x", 200)
+                  .attr("y", 630)
+                  .attr("fill", "#808080");
+
+    var moji_rank_1 = svg.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", width -200)
+                        .attr("y", height - 150)
+                        .style("font-size", "15px")
+                        .style("color", "red")
+                        .text("");
+    
+    var moji_rank_2 = svg.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", width -200)
+                        .attr("y", height - 120)
+                        .style("font-size", "15px")
+                        .style("color", "red")
+                        .text("");
+    
+    var moji_rank_3 = svg.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", width -200)
+                        .attr("y", height - 90)
+                        .style("font-size", "15px")
+                        .style("color", "red")
+                        .text("");
+
+
+    // bind nodes data to circle elements
+    const elements = svg.selectAll('.bubble')
+      .data(nodes, d => d.let)
+      .enter()
+      .append('g')
+      .on("click", function(event, d){
+        var tmp = d.let;
+        d3.csv('kanji_rank.csv').then(function(data){
+          data.forEach(function(f) {
+            if (tmp == f.let) {
+              rect.attr("fill", "rgb(200,200,200)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+              moji_rank_1.text("「"+f.let+"」という漢字は")
+              moji_rank_2.text(f.pref_ja+" "+f.cityname_ja)
+                        .on("click", function(event, d) {
+                          window.location.href = "./bubble.html?prefecture="+f.pref_en+"&cityname="+f.cityname_en;
+                        });
+              moji_rank_3.text("で多く使われています")
+            }
+          })
+        });
+        console.log(d.let);
+      })
+
+    bubbles = elements
+      .append('circle')
+      .classed('bubble', true)
+      .attr('r', d => d.radius)
+      .attr('fill', d => fillColour("2"))
+
+    // labels
+    labels = elements
+      .append('text')
+      .attr('dy', '.3em')
+      .style('text-anchor', 'middle')
+      .style('font-size', 10)
+      .text(d => d.let)
+
+    d3.csv("ranking.csv").then(function(data) {
+      data.forEach(function(d){
+      if ((d.pref_en == prefecture) && (d.cityname_en == cityname)) {
+
+        var rect_title = svg.append("rect")
+                  .attr("width", 300)
+                  .attr("height", 80)
+                  .attr("x", 110)
+                  .attr("y", 70)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+
+        var text1 = svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("x", width - 250)
+        .attr("y", height - 700)
+        .style("font-size", "20px")
+        .style("color", "red")
+        .style("text-align", "start")
+        .text("「"+d.pref_ja+" "+d.cityname_ja+"」");
+
+        var text2 = svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("x", width -200)
+        .attr("y", height - 670)
+        .style("font-size", "20px")
+        .style("color", "red")
+        .text("の地名によく使われている漢字");
+      }
+    })
+    });
+
+    
+
+    // set simulation's nodes to our newly created nodes array
+    // simulation starts running automatically once nodes are set
+    simulation.nodes(nodes)
+      .on('tick', ticked)
+      .restart();
+  }
+
+  
+
+  // callback function called after every tick of the force simulation
+  // here we do the actual repositioning of the circles based on current x and y value of their bound node data
+  // x and y values are modified by the force simulation
+  function ticked() {
+    bubbles
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+
+    labels
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+  }
+
+  // return chart function from closure
+  return chart;
+}
+
+
+
+
+
+// -----------------------------------------//
+
+
+
+
+
+function bubbleChart2(classname) {
+  const width = 250;
+  const height = 800;
+
+  const centre = { x: width/2 ,y: height/2 };
+
+  const forceStrength = 0.05;
+
+  let svg = null;
+  let bubbles = null;
+  let labels = null;
+  let nodes = [];
+
+  function charge(d) {
+    return Math.pow(d.radius, 2.0) * 0.01
+  }
+
+  const simulation = d3.forceSimulation()
+    .force('charge', d3.forceManyBody().strength(charge))
+    .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+    .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+    .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+  simulation.stop();
+
+  const fillColour = d3.scaleOrdinal()
+  	.domain(["1", "2", "3", "5", "99"])
+  	.range(["#0074D9", "#7FDBFF", "#39CCCC", "#3D9970", "#AAAAAA"]);
+
+  function createNodes(rawData) {
+    const maxSize = d3.max(rawData, d => +d.num);
+
+    const radiusScale = d3.scaleSqrt()
+      .domain([0, maxSize])
+      .range([0, 15])
+
+    const myNodes = rawData.map(d => ({
+      ...d,
+      radius: radiusScale(+d.num),
+      size: +d.num,
+      x: Math.random() * 900,
+      y: Math.random() * 800
+    }))
+
+    return myNodes;
+  }
+
+  let chart = function chart(selector, rawData) {
+    nodes = createNodes(rawData);
+
+    svg = d3.select(selector)
+      .append('svg')
+      .attr("class", classname)
+      .attr('width', width)
+      .attr('height', height)
+    
+    if (classname == "svg_rank1") {
+
+      var rect_title2 = svg.append("rect")
+                  .attr("width", 240)
+                  .attr("height", 40)
+                  .attr("x", 5)
+                  .attr("y", 70)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 2);
+
+      var title = svg.append("text")
+        .attr("x", 5)
+        .attr("y", 100)
+        .text("似た漢字が使われている自治体")
+        .style("font-size", "17px");
+
+
+      var rect_rank1 = svg.append("rect")
+                  .attr("width", 160)
+                  .attr("height", 60)
+                  .attr("x", 5)
+                  .attr("y", 120)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 2);
+
+      var ranking_1st_up = svg.append("text")
+        .attr("y", 140)
+        .attr("x", 7)
+        .text("第１位")
+        .style("font-size", "15px");
+
+      ranking_1st_down = svg.append("text")
+        .attr("x", 7)
+        .attr("y", 165)
+        .text(rank1_ja_p+rank1_ja_c)
+        .style("font-size", "15px")
+        .on("click", function(event, d) {
+          window.location.href = "./bubble.html?prefecture="+rank1_p+"&cityname="+rank1_c;
+        });
+
+    }
+
+    else if (classname == "svg_rank2") {
+
+      var rect_rank2 = svg.append("rect")
+                  .attr("width", 160)
+                  .attr("height", 60)
+                  .attr("x", 5)
+                  .attr("y", 120)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 2);
+
+      var ranking_2nd_up = svg.append("text")
+        .attr("x", 7)
+        .attr("y", 140)
+        .text("第２位")
+        .style("font-size", "15px");
+
+      ranking_2nd_down = svg.append("text")
+        .attr("x", 7)
+        .attr("y", 165)
+        .text(rank2_ja_p+rank2_ja_c)
+        .style("font-size", "15px")
+        .on("click", function(event, d) {
+          window.location.href = "./bubble.html?prefecture="+rank2_p+"&cityname="+rank2_c;
+        });
+
+    }
+
+    else if (classname == "svg_rank3") {
+
+      var rect_rank3 = svg.append("rect")
+                  .attr("width", 160)
+                  .attr("height", 60)
+                  .attr("x", 5)
+                  .attr("y", 120)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 2);
+
+      var ranking_3rd_up = svg.append("text")
+        .attr("x", 7)
+        .attr("y", 140)
+        .text("第３位")
+        .style("font-size", "15px");
+
+      ranking_3rd_down = svg.append("text")
+        .attr("y", 165)
+        .attr("x", 7)
+        .text(rank3_ja_p+rank3_ja_c)
+        .style("font-size", "15px")
+        .on("click", function(event, d) {
+          window.location.href = "./bubble.html?prefecture="+rank3_p+"&cityname="+rank3_c;
+        });
+
+    }     
+    
+
+    const elements = svg.selectAll('.bubble')
+      .data(nodes, d => d.let)
+      .enter()
+      .append('g')
+
+    bubbles = elements
+      .append('circle')
+      .classed('bubble', true)
+      .attr('r', d => d.radius)
+      .attr('fill', d => fillColour("3"))
+
+    labels = elements
+      .append('text')
+      .attr('dy', '.3em')
+      .style('text-anchor', 'middle')
+      .style('font-size', 10)
+      .text(d => d.let)
+
+    simulation.nodes(nodes)
+      .on('tick', ticked)
+      .restart();
+  }
+
+  function ticked() {
+    bubbles
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+
+    labels
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+  }
+
+  return chart;
+}
+
+
+
+
+
+
+
+
+// new bubble chart instance
+let myBubbleChart = bubbleChart();
+let myBubbleChart_rank1 = bubbleChart2("svg_rank1");
+let myBubbleChart_rank2 = bubbleChart2("svg_rank2");
+let myBubbleChart_rank3 = bubbleChart2("svg_rank3");
+
+// function called once promise is resolved and data is loaded from csv
+// calls bubble chart function to display inside #vis div
+function display(data) {
+  myBubbleChart('#vis', data);
+}
+function display_rank1(data) {
+  myBubbleChart_rank1('#vis', data);
+}
+
+function display_rank2(data) {
+  myBubbleChart_rank2('#vis', data);
+}
+
+function display_rank3(data) {
+  myBubbleChart_rank3('#vis', data);
+}
+
+function rank(data) {
+  data.forEach(function(d){
+    if ((d.pref_en == prefecture) && (d.cityname_en == cityname)) {
+      // console.log(d.cityname);
+      // ranking_1st_down.text(d.rank1_pref_ja+" "+d.rank1_cityname_ja);
+      // ranking_2nd_down.text(d.rank2_pref_ja+" "+d.rank2_cityname_ja);
+      // ranking_3rd_down.text(d.rank3_pref_ja+" "+d.rank3_cityname_ja);
+
+      rank1_p = d.rank1_pref_en;
+      rank1_c = d.rank1_cityname_en;
+      rank2_p = d.rank2_pref_en;
+      rank2_c = d.rank2_cityname_en;
+      rank3_p = d.rank3_pref_en;
+      rank3_c = d.rank3_cityname_en;
+
+      rank1_ja_p = d.rank1_pref_ja;
+      rank1_ja_c = d.rank1_cityname_ja;
+      rank2_ja_p = d.rank2_pref_ja;
+      rank2_ja_c = d.rank2_cityname_ja;
+      rank3_ja_p = d.rank3_pref_ja;
+      rank3_ja_c = d.rank3_cityname_ja;
+
+      d3.csv('./prefectures/'+rank1_p+'/'+rank1_c+'_res.csv').then(display_rank1).then(function(){
+        d3.csv('./prefectures/'+rank2_p+'/'+rank2_c+'_res.csv').then(display_rank2).then(function(){
+          d3.csv('./prefectures/'+rank3_p+'/'+rank3_c+'_res.csv').then(display_rank3);
+        });
+      });
+      
+      
+    }
+  })
+}
+
+
+
+
+</script>
+</body>

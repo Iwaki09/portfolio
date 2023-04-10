@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>Gunma</title>
+        <script src="./d3.js" charset="utf-8"></script>
+        <script src="./topojson.js" charset="utf-8"></script>
+    </head>
+<button id="home">Home画面に戻る</button>
+<body>
+
+<body bgcolor = "#505050"></body>
+
+<p><label for = "city">調べたい都市を選択してください</label>
+<select id="city">
+<option value = "">選択してください</option>
+<option value = "annaka">安中市</option>
+<option value = "isesaki">伊勢崎市</option>
+<option value = "itakura">板倉町</option>
+<option value = "ueno">上野村</option>
+<option value = "oizumi">大泉町</option>
+<option value = "ota">太田市</option>
+<option value = "ora">邑楽町</option>
+<option value = "katashina">片品村</option>
+<option value = "kawaba">川場村</option>
+<option value = "kanna">神流町</option>
+<option value = "kanra">甘楽町</option>
+<option value = "kiryu">桐生市</option>
+<option value = "kusatsu">草津町</option>
+<option value = "shibukawa">渋川市</option>
+<option value = "shimonita">下仁田町</option>
+<option value = "showa">昭和村</option>
+<option value = "shinto">榛東村</option>
+<option value = "takasaki">高崎市</option>
+<option value = "takayama">高山村</option>
+<option value = "tatebayashi">館林市</option>
+<option value = "tamamura">玉村町</option>
+<option value = "chiyoda">千代田町</option>
+<option value = "tsumagoi">嬬恋村</option>
+<option value = "tomioka">富岡市</option>
+<option value = "nakanojo">中之条町</option>
+<option value = "naganohara">長野原町</option>
+<option value = "nanmoku">南牧村</option>
+<option value = "numata">沼田市</option>
+<option value = "higashiagatsuma">東吾妻町</option>
+<option value = "fujioka">藤岡市</option>
+<option value = "maebashi">前橋市</option>
+<option value = "midori">みどり市</option>
+<option value = "minakami">みなかみ町</option>
+<option value = "meiwa">明和町</option>
+<option value = "yoshioka">吉岡町</option>
+</select></p>
+
+<div>
+<input type = "button" value = "Check" id = "checkButton">
+</div>
+
+<svg id="map" style="background-color: #505050;"></svg>
+
+<svg id="bubble" style="background-color: #505050;"></svg>
+
+<script>
+var width = 800;
+var height = 800;
+
+var projection = d3.geoMercator()
+                    .center([138.9, 36.5])
+                    .translate([width/2, height/2])
+                    .scale(28000);
+
+var coordinate = projection([0, 0]);
+
+function buttonClick(){
+    if(cityname === "kusatsu"){
+        console.log(citySelect.value);
+        window.location.href = "../../bubble.html?prefecture=gunma&cityname=kusatsu";
+    }
+}
+
+function valueChange(){
+    cityname = citySelect.value;
+    console.log('cityname:' + cityname);
+    if(cityname = ""){
+        d3.select("circle").remove();
+    }
+    else if (cityname === "kusatsu"){
+        d3.select("circle").remove();
+
+        coordinate = projection([138.596, 36.6207]);
+
+        svg.append("g")
+        .append("circle")
+        .attr("cx", coordinate[0])
+        .attr("cy", coordinate[1])
+        .attr("r", 8)
+        .attr("stroke", "black")
+        .attr("fill", "red");
+    }
+}
+let citySelect = document.getElementById('city');
+    citySelect.options[0].selected = true;
+    citySelect.addEventListener('change', valueChange);
+
+    let cityname = citySelect.value;
+
+    let checkButton = document.getElementById('checkButton');
+    checkButton.addEventListener('click', buttonClick);
+
+    document.getElementById("home").onclick = function(){
+        window.location.href = "../../map.html";
+    }
+</script>
+
+<script type = "text/javascript">
+
+var svg = d3.select("#map")
+            .attr("width", width)
+            .attr("height", height);
+
+var svg_bubble = d3.select("#bubble")
+    .attr("width", "400")
+    .attr("height", height);
+
+d3.json("./10.topojson").then(function(data){
+
+    var Gunma = topojson.feature(data, data.objects.Gunma);
+
+    var projection = d3.geoMercator()
+                    .center([138.9, 36.5])
+                    .translate([width/2, height/2])
+                    .scale(28000);
+
+    var path = d3.geoPath().projection(projection);
+
+
+    svg.selectAll("path")
+        .data(Gunma.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", "white")
+        .attr("stroke", "#333333")
+        .attr("stroke-width", 0.3);
+
+        d3.csv("./"+"gunma"+'_for_bubble.csv').then(display);
+
+    function bubbleChart() {
+        const width = 400;
+        const height = 800;
+
+        const centre = { x: width/2 ,y: height/2 };
+
+        const forceStrength = 0.05;
+
+        let svg = null;
+        let bubbles = null;
+        let labels = null;
+        let nodes = [];
+
+        function charge(d) {
+            return Math.pow(d.radius, 2.0) * 0.01
+        }
+
+        const simulation = d3.forceSimulation()
+            .force('charge', d3.forceManyBody().strength(charge))
+            .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+            .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+            .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+        simulation.stop();
+
+        const fillColour = d3.scaleOrdinal()
+            .domain(["1", "2", "3", "5", "99"])
+            .range(["#0074D9", "#7FDBFF", "#39CCCC", "#3D9970", "#AAAAAA"]);
+
+        function createNodes(rawData) {
+            const maxSize = d3.max(rawData, d => +d.num);
+
+            const radiusScale = d3.scaleSqrt()
+            .domain([0, maxSize])
+            .range([0, 25])
+
+            const myNodes = rawData.map(d => ({
+            ...d,
+            radius: radiusScale(+d.num),
+            size: +d.num,
+            x: Math.random() * 900,
+            y: Math.random() * 800
+            }))
+
+            return myNodes;
+        }
+
+        let chart = function chart(selector, rawData) {
+            nodes = createNodes(rawData);
+
+            
+
+            svg_bubble = d3.select(selector)
+            .append('svg')
+            .attr("class", "svg_bubble")
+            .attr('width', width)
+            .attr('height', height)
+
+            var rect = svg_bubble.append("rect")
+                  .attr("width", 370)
+                  .attr("height", 50)
+                  .attr("x", 10)
+                  .attr("y", 165)
+                  .attr("fill", "rgb(188,226,232)")
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+            
+            svg_bubble.append("text")
+                .attr("text-anchor", "end")
+                .attr("x", width - 30)
+                .attr("y", height - 600)
+                .style("font-size", "20px")
+                .style("color", "red")
+                .text("群馬県の地名でよく使われている漢字");
+            
+                
+
+            const elements = svg_bubble.selectAll('.bubble')
+            .data(nodes, d => d.let)
+            .enter()
+            .append('g')
+
+            bubbles = elements
+            .append('circle')
+            .classed('bubble', true)
+            .attr('r', d => d.radius)
+            .attr('fill', d => fillColour("3"))
+
+            labels = elements
+            .append('text')
+            .attr('dy', '.3em')
+            .style('text-anchor', 'middle')
+            .style('font-size', 10)
+            .text(d => d.let)
+
+            simulation.nodes(nodes)
+            .on('tick', ticked)
+            .restart();
+        }
+
+        function ticked() {
+            bubbles
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+
+            labels
+            .attr('x', d => d.x)
+            .attr('y', d => d.y)
+        }
+
+        return chart;
+        }
+
+    let myBubbleChart = bubbleChart();
+
+    function display(data) {
+        myBubbleChart("#bubble", data);
+    }
+})
+</script>
+</body>
