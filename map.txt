@@ -1,3 +1,0 @@
-各都道府県の地図をtopojsonを使って描画する方法の参考になりそうなものを発見。
-https://github.com/niiyz/JapanCityGeoJson
-
