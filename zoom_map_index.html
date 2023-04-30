@@ -30,7 +30,7 @@
             .attr("height", height);
 
         d3.json("./japan.json").then(function(data) {
-            svg.selectAll("path")  // おまじない。というか理解できてない
+            svg.selectAll("path") 
                 .data(topojson.feature(data, data.objects.pref).features)
                 .enter() // dataで入れた配列をそれぞれ以下のpathにしていく
                 .append("path")
